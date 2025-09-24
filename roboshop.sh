@@ -20,6 +20,30 @@ do
         RECORD_NAME=$DOMAIN_NAME
     fi
 
-    echo $instance $RECORD_NAME
+    echo $instance $RECORD_NAME  $IP
+
+    
+aws route53 change-resource-record-sets 
+     --hosted-zone-id $HOSTED_ZONE
+     --change-batch '
+        {
+        "Comment": "Updating RECORD for ROUTE53",
+        "Changes": [
+            {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "$RECORD_NAME",
+                "Type": "A",
+                "TTL": 1,
+                "ResourceRecords": [
+                {
+                    "Value": "$IP"
+                }
+                ]
+            }
+            }
+        ]
+        }
+    '
 
 done
