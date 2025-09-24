@@ -23,8 +23,8 @@ do
     echo $instance $RECORD_NAME  $IP
 
     
-aws route53 change-resource-record-sets
-    --hosted-zone-id $HOSTED_ZONE
+aws route53 change-resource-record-sets \
+    --hosted-zone-id $HOSTED_ZONE \
     --change-batch '
         {
         "Comment": "Updating RECORD for ROUTE53",
