@@ -11,7 +11,7 @@ SCRIPT_NAME="$(echo $0 | cut -d '.' -f1)"
 LOG_FILE="$LOG_FOLDER/$SCRIPT_NAME.log"
 
 mkdir -p $LOG_FOLDER
-echo "Script started executing at: $(date)" | tee -a $LOG_FILE
+echo -e "Script started executing at: $(date)" | tee -a $LOG_FILE
 
 if [ $USERID -ne 0 ]; then
     echo -e "ERROR::Please run this with root ccess" | tee -a $LOG_FILE
@@ -43,10 +43,10 @@ if [ $? -ne 0 ]; then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
     VALIDATE $? "Creating System user roboshop"
 else
-    echo -e 'User already exists...$G SKIPPING $N' | tee -a &>>$LOG_FILE
+    echo -e "User already exists...$Y SKIPPING $W" | tee -a &>>$LOG_FILE
 fi
 
-mkdir -p  /app 
+mkdir -p  /app &>>$LOG_FILE
 
 rm -rf /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "tmp directory catalogue.zip file cleanup"
@@ -65,7 +65,7 @@ VALIDATE $? "unzipping catalogue to app directory"
 
 npm install  &>>$LOG_FILE
 
-cp $SCRIPT_PATH/catalogue.service  /etc/systemd/system/catalogue.service
+cp $SCRIPT_PATH/catalogue.service  /etc/systemd/system/catalogue.service &>>$LOG_FILE
 
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon-reload"
