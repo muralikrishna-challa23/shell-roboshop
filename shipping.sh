@@ -79,6 +79,7 @@ VALIDATE $? "Starting shipping"
 
 
 dnf install mysql -y &>>$LOG_FILE
+VALIDATE $? "Installing mysql client"
 
 mysql -h mysql.mkreddy.shop -uroot -pRoboShop@1 -e 'use cities' &>>$LOG_FILE
 if [ $? -ne 0 ]; then
@@ -90,5 +91,6 @@ else
 fi
 
 systemctl restart shipping &>>$LOG_FILE
+VALIDATE $? "Restarting Shipping"
 
 
