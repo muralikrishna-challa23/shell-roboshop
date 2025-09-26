@@ -48,44 +48,44 @@ fi
 
 mkdir -p  /app 
 
-rm -rf /tmp/catalogue.zip
+rm -rf /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "tmp directory catalogue.zip file cleanup"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip  &>>$LOG_FILE
 VALIDATE $? "Downloading Catalogue to /tmp directory"
 
-cd /app 
+cd /app &>>$LOG_FILE
 VALIDATE $? "Moving to app directory"
 
-rm -rf /app/*
+rm -rf /app/* &>>$LOG_FILE
 VALIDATE $? "cleanup app directory"
 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "unzipping catalogue to app directory"
 
-npm install 
+npm install  &>>$LOG_FILE
 
 cp $SCRIPT_PATH/catalogue.service  /etc/systemd/system/catalogue.service
 
-systemctl daemon-reload
+systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon-reload"
 
-systemctl enable catalogue
+systemctl enable catalogue &>>$LOG_FILE
 VALIDATE $? "uEnabling Catalogue"
 
-systemctl start catalogue
+systemctl start catalogue &>>$LOG_FILE
 VALIDATE $? "Starting Catalogue"
 
-cp $SCRIPT_PATH/mongo.repo /etc/yum.repos.d/mongo.repo
+cp $SCRIPT_PATH/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
 VALIDATE $? "mongodb repo copy"
 
-dnf install mongodb-mongosh -y
+dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "mongodb repo copy"
 
-mongosh --host MONGODB-SERVER-IPADDRESS </app/db/master-data.js
+mongosh --host mongo.mkreddy.shop </app/db/master-data.js &>>$LOG_FILE
 VALIDATE $? "mongodb repo copy"
 
-systemctl restart catalogue
+systemctl restart catalogue &>>$LOG_FILE
 VALIDATE $? "Catalogue service restart"
 
 
