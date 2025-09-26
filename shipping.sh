@@ -64,9 +64,9 @@ VALIDATE $? "cleanup package"
 mv /app/target/shipping-1.0.jar /app/shipping.jar &>>$LOG_FILE
 VALIDATE $? "move shipping.jar to app directory "
 
-npm install  &>>$LOG_FILE
 
 cp $SCRIPT_PATH/shipping.service  /etc/systemd/system/shipping.service &>>$LOG_FILE
+VALIDATE $? "Creating shipping service"
 
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon-reload"
