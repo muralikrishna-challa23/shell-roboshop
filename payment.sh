@@ -57,7 +57,7 @@ VALIDATE $? "cleanup app directory"
 unzip /tmp/payment.zip &>>$LOG_FILE
 VALIDATE $? "unzipping payment to app directory"
 
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt &>>$LOG_FILE
 VALIDATE $? "install dependencies"
 
 cp $SCRIPT_PATH/payment.service  /etc/systemd/system/payment.service &>>$LOG_FILE
