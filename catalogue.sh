@@ -71,7 +71,7 @@ systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon-reload"
 
 systemctl enable catalogue &>>$LOG_FILE
-VALIDATE $? "uEnabling Catalogue"
+VALIDATE $? "Enabling Catalogue"
 
 systemctl start catalogue &>>$LOG_FILE
 VALIDATE $? "Starting Catalogue"
@@ -80,10 +80,10 @@ cp $SCRIPT_PATH/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
 VALIDATE $? "mongodb repo copy"
 
 dnf install mongodb-mongosh -y &>>$LOG_FILE
-VALIDATE $? "mongodb repo copy"
+VALIDATE $? "Installing mongodb client"
 
 mongosh --host mongo.mkreddy.shop </app/db/master-data.js &>>$LOG_FILE
-VALIDATE $? "mongodb repo copy"
+VALIDATE $? "Load master data to mongodb"
 
 systemctl restart catalogue &>>$LOG_FILE
 VALIDATE $? "Catalogue service restart"
