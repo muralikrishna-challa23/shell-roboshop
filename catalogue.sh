@@ -82,8 +82,13 @@ VALIDATE $? "mongodb repo copy"
 dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "Installing mongodb client"
 
-mongosh --host mongo.mkreddy.shop </app/db/master-data.js &>>$LOG_FILE
-VALIDATE $? "Load master data to mongodb"
+MONGODATA=$(mongosh mongo.mkreddy.shop --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')" )
+if [ $MONGODATA -le 0 ]; then
+    mongosh --host mongo.mkreddy.shop </app/db/master-data.js &>>$LOG_FILE
+    VALIDATE $? "Load master data to mongodb"
+else
+  echo -e "Master data already loaded.. $Y SKIPPING $W"
+fi
 
 systemctl restart catalogue &>>$LOG_FILE
 VALIDATE $? "Catalogue service restart"
