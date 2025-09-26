@@ -1,0 +1,93 @@
+#!/bin/bash
+
+USERID=$(id -u)
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+W="\e[0m"
+
+LOG_FOLDER="/var/log/shell-roboshop"
+SCRIPT_NAME="$(echo $0 | cut -d '.' -f1)"
+LOG_FILE="$LOG_FOLDER/$SCRIPT_NAME.log"
+
+mkdir -p $LOG_FOLDER
+echo "Script started executing at: $(date)" | tee -a $LOG_FILE
+
+if [ $USERID -ne 0 ]; then
+    echo -e "ERROR::Please run this with root ccess" | tee -a $LOG_FILE
+    exit 1
+ fi
+
+VALIDATE() {
+if [ $1 -ne 0 ]; then
+    echo -e "ERROR::  $2 ....$R FAILURE $W" | tee -a $LOG_FILE
+    exit 1
+ else
+    echo -e " $2 .....$G SUCCESS $W"    | tee -a $LOG_FILE
+ fi
+}
+
+SCRIPT_PATH=$PWD
+
+dnf module disable nodejs -y &>>$LOG_FILE
+VALIDATE $? "Disable NodeJs"
+
+dnf module enable nodejs:20 -y &>>$LOG_FILE
+VALIDATE $? "Enable NodeJs 20"
+
+dnf install nodejs -y &>>$LOG_FILE
+VALIDATE $? "Installing NodeJs"
+
+id roboshop
+if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating System user roboshop"
+else
+    echo -e 'User already exists...$G SKIPPING $N' | tee -a &>>$LOG_FILE
+fi
+
+mkdir -p  /app 
+
+rm -rf /tmp/catalogue.zip
+VALIDATE $? "tmp directory catalogue.zip file cleanup"
+
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
+VALIDATE $? "Downloading Catalogue to /tmp directory"
+
+cd /app 
+VALIDATE $? "Moving to app directory"
+
+rm -rf /app/*
+VALIDATE $? "cleanup app directory"
+
+unzip /tmp/catalogue.zip
+VALIDATE $? "unzipping catalogue to app directory"
+
+npm install 
+
+cp $SCRIPT_PATH/catalogue.service  /etc/systemd/system/catalogue.service
+
+systemctl daemon-reload
+VALIDATE $? "daemon-reload"
+
+systemctl enable catalogue
+VALIDATE $? "uEnabling Catalogue"
+
+systemctl start catalogue
+VALIDATE $? "Starting Catalogue"
+
+cp $SCRIPT_PATH/mongo.repo /etc/yum.repos.d/mongo.repo
+VALIDATE $? "mongodb repo copy"
+
+dnf install mongodb-mongosh -y
+VALIDATE $? "mongodb repo copy"
+
+mongosh --host MONGODB-SERVER-IPADDRESS </app/db/master-data.js
+VALIDATE $? "mongodb repo copy"
+
+systemctl restart catalogue
+VALIDATE $? "Catalogue service restart"
+
+
+
+
